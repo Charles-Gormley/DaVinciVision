@@ -22,10 +22,11 @@ class PathDir:
             f.write(file_path)
     
     def get_path_and_chdir(self):
+        os.chdir(self.cwd)
         if not self.check_file():
             print("Please create .artistdata file. helpers folder for details.")
 
-        os.chdir(self.cwd)
+        
         with open('.artistdata', 'r') as f:
             self.file_path = f.read()
         
