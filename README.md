@@ -10,6 +10,14 @@ https://www.kaggle.com/datasets/ikarus777/best-artworks-of-all-time
 * images.zip: A collection of full-sized images, divided into folders and sequentially numbered.
 * resized.zip: A resized version of the image collection, extracted from the folder structure for faster processing.
 
+## EDA
+Looking At HSV Visualization of Van Gogh Painting: 
+
+
+https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/e9e5f86f-3b6b-4cb3-bdfd-3a7eeb9c0cd3
+
+
+
 ## Models
 ### CNN Models 
 * AlexNet
