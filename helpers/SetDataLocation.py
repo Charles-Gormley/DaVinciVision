@@ -1,5 +1,9 @@
 import os 
 
+# :::::USER CHANGE VALUE HERE:::::
+# Location of artists dataset
+path_to_dataset = "C:/Users/Charl/OneDrive/Documents/Education/Drexel/du_term_spring_23/DSCI-471/FinalProject" 
+
 class PathDir:
 
     def __init__(self):
@@ -31,3 +35,8 @@ class PathDir:
             self.file_path = f.read()
         
         os.chdir(self.file_path)
+
+
+if __name__ == "__main__":
+    path_dir = PathDir()
+    path_dir.create_file(path_to_dataset)
