@@ -1,5 +1,12 @@
 # DaVinciVision 🎨
-Project for DSCI-471 where the aim is to build CNN prediction models which predict which artist created an artwork. 
+Project for DSCI-471 where the aim is to build CNN prediction models which predict which artist created an artwork.
+
+## Getting Started
+1. Pull the Repo. 
+2. Download this dataset and **copy the directory where you saved it**.
+3. Navigate to the *helpers/SetDataLocation.py* file and change the vlaue for the *path_to_dataset* variables with correct file path splitting for your os ( / - for windows )
+4. Run the SetDataLocation.py File. Now you can work with the noteobooks! 👏
+5. Check out hte Analysis.ipynb file
 
 ## Dataset
 https://www.kaggle.com/datasets/ikarus777/best-artworks-of-all-time
