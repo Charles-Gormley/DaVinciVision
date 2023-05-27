@@ -4,3 +4,4 @@ delete.py
 *.csv
 *.png
 *.jpg
+*.pkl
