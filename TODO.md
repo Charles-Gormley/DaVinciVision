@@ -9,3 +9,4 @@
 
 * [ ] = Create different types of resizing techniques.
 * [ ] = Perhaps Try adding a monocolar depth map cnn
+* [ ] = Increase sample size for hsv and rgb distributions artist to artist.
