@@ -231,6 +231,12 @@ class TrainModel:
         history['val_accuracy'] = self.short_history.history['val_accuracy'] 
         history['lr'] = self.short_history.history['lr']
 
+        history['last-accuracy'] = history['accuracy'][-1]
+        history['last-loss'] = history['loss'][-1]
+        history['last-val_loss'] = history['val_loss'][-1]
+        history['last-val_accuracy'] = history['val_accuracy'][-1]
+        history['last-lr'] = history['lr'][-1]
+
         
         history['arch'] = self.archictecture
         history['batch-size'] = self.batch_size
@@ -242,10 +248,16 @@ class TrainModel:
         if self.short_history.history['accuracy'][-1] > 0.14: # Making sure first couple layers is atleast above 50% accuracy.
             self.full_model()
 
-            history[''] += self.full_history.history['loss']
-            history[' '] += self.full_history.history['accuracy']
-            history[' '] += self.full_history.history['val_loss']
-            history[' '] += self.full_history.history['val_accuracy']
-            history[' '] += self.full_history.history['lr']
+            history['loss'] += self.full_history.history['loss']
+            history['accuracy'] += self.full_history.history['accuracy']
+            history['val_loss'] += self.full_history.history['val_loss']
+            history['val_accuracy'] += self.full_history.history['val_accuracy']
+            history['lr'] += self.full_history.history['lr']
+
+            history['last-accuracy'] = history['accuracy'][-1]
+            history['last-loss'] = history['loss'][-1]
+            history['last-val_loss'] = history['val_loss'][-1]
+            history['last-val_accuracy'] = history['val_accuracy'][-1]
+            history['last-lr'] = history['lr'][-1]
         
         return history
