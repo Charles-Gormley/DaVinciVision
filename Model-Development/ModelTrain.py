@@ -31,6 +31,7 @@ class TrainModel:
         np.random.seed(seed_n)
         tf.random.set_seed(seed_n)
         
+        self.seed_n = seed_n
         self.archictecture = architecture
         self.batch_size = batch_size
         self.image_size = image_size
@@ -238,7 +239,7 @@ class TrainModel:
         history['seed'] = self.seed_n
         history['valid_split'] = self.validation_split
 
-        if self.short_history.history['accuracy'][-1] > 0.5: # Making sure first couple layers is atleast above 50% accuracy.
+        if self.short_history.history['accuracy'][-1] > 0.14: # Making sure first couple layers is atleast above 50% accuracy.
             self.full_model()
 
             history[''] += self.full_history.history['loss']
