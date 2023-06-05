@@ -33,3 +33,24 @@ https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/e9e5f86f-3b6b-4
 * Inception Network(s)
 * ResNet & ResNeXt
 * DenseNet
+
+## Class Path
+- main-directory/
+    - class_1/
+        - image_1.jpg
+        - image_2.jpg
+        ...
+    - class_2/
+        - image_1.jpg
+        - image_2.jpg
+    etc...
+- filtered-directory/
+    - class_1-filtered/
+        - image_1.jpg
+        - image_2.jpg
+        ...
+    - class_2-filtered/
+        - image_1.jpg
+        - image_2.jpg
+    etc...
+etc...
