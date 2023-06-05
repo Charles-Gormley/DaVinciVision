@@ -260,8 +260,7 @@ class TrainModel:
                                      input_shape=self.train_input_shape,
                                      pooling=None,
                                      classes=self.n_classes,
-                                     classifier_activation="softmax",
-                                     batch_norm=self.normalization
+                                     classifier_activation="softmax"
                                     )
 
         elif self.archictecture == "GoogLeNet":

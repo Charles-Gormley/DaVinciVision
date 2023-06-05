@@ -25,17 +25,44 @@ import shutil
 from FilterGenerator import CustomGenerator
 
 class TrainModel:
-    def __init__(self, architecture:str, batch_size:int, image_size:int, validation_split:float, learning_rate:float, seed_n:int, verbose:int, best_classes:bool, normalization:bool, dropout:bool, dropout_rate:float, hsv:bool, garbor:bool, laplacian:bool, custom_gen:bool, home_dir="/home/ceg98/Documents/"):
-        tf.random.set_seed(seed_n)
+    def __init__(self, 
+                 architecture:str, 
+                 batch_size:int, 
+                 image_size:int, 
+                 validation_split:float, 
+                 learning_rate:float, 
+                 seed_n:int, 
+                 verbose:int, 
+                 best_classes:bool, 
+                 normalization:bool, 
+                 dropout:bool, 
+                 dropout_rate:float, 
+                 garbor:bool, 
+                 laplacian:bool, 
+                 custom_gen:bool, 
+                 augments:bool, 
+                 short_epochs:int, 
+                 full_epoch:int, 
+                 full_cutoff:float, 
+                 weights_dir:str, 
+                 model_name:str, 
+                 home_dir="/home/ceg98/Documents/"):
         
-        self.n_features = 7
+        tf.random.set_seed(seed_n)
+        self.n_features = 3
+        if custom_gen:
+            if laplacian:
+                self.n_features += 1
+            if garbor:
+                self.n_features += 3
+
+        
         self.seed_n = seed_n
         self.archictecture = architecture
         self.batch_size = batch_size
         self.image_size = image_size
         self.validation_split = validation_split
         self.lr = learning_rate
-        self.images_dir = home_dir + "archive/resized/resized"
         self.train_input_shape = (self.image_size, self.image_size, self.n_features)
         self.home_dir = home_dir
         self.verbose = verbose
@@ -43,11 +70,22 @@ class TrainModel:
         self.normalization = normalization
         self.dropout = dropout
         self.dropout_rate = dropout_rate
+        self.augments = augments
+
+        self.short_epoch = short_epochs
+        self.full_epoch = full_epoch
+        self.full_cutoff = full_cutoff
+        
 
         self.custom_gen = custom_gen
+        # Pathing Directories
+        self.train_dir = self.home_dir + "sample"
+        self.valid_dir = self.home_dir + "valid"
+        self.weight_dir = self.home_dir + 'weights/' + weights_dir
+        self.model_name = model_name
 
+        
         # Extra Filters
-        self.hsv = hsv
         self.garbor = garbor
         self.laplacian = laplacian
 
@@ -81,36 +119,31 @@ class TrainModel:
 
         self.class_weights = self.weighted_artists['weights'].to_dict() # TODO: Check if this causing a bug. 
         self.artists_name = self.weighted_artists['name'].str.replace(' ', '_').values
-        self.images_dir = self.home_dir + "archive/resized/resized"
-        self.n_classes = self.weighted_artists.shape[0]
-    
-    def add_extra_dimensions(self, image):
-        # Add your custom logic to add extra dimensions
-        # For example, you can create additional channels or concatenate extra data
-        extra_data = np.random.randn(image.shape[0], image.shape[1], 1)  # Example of adding an extra channel
-        image_with_extra_dims = np.concatenate([image, extra_data], axis=-1)
-        return image_with_extra_dims
+        self.n_classes = self.weighted_artists.shape[0] 
 
     def create_generators(self):
         
         if self.custom_gen:
-            self.train_generator = CustomGenerator(directory=self.images_dir,
+            self.train_generator = CustomGenerator(directory=self.train_dir,
                                                    batch_size=self.batch_size,
-                                                   laplacian=True,
-                                                   garbor=True,
-                                                   augments=True,
-                                                   classes=self.artists_name.tolist())
+                                                   laplacian=self.laplacian,
+                                                   garbor=self.garbor,
+                                                   classes=self.artists_name.tolist(),
+                                                   weighted=True,
+                                                   augments=self.augments,
+                                                   image_size=self.image_size)
 
-            self.valid_generator = CustomGenerator(directory=self.images_dir,
+            self.valid_generator = CustomGenerator(directory=self.valid_dir,
                                                    batch_size=self.batch_size,
-                                                   laplacian=True,
-                                                   garbor=True,
-                                                   classes=self.artists_name.tolist())
+                                                   laplacian=self.laplacian,
+                                                   garbor=self.garbor,
+                                                   classes=self.artists_name.tolist(),
+                                                   image_size=self.image_size)
 
             self.STEP_SIZE_TRAIN = len(self.train_generator)
             self.STEP_SIZE_VALID = len(self.valid_generator)
 
-        else:
+        elif not self.custom_gen:
 
             self.train_datagen = ImageDataGenerator(validation_split=0.2,
                                                     rescale=1/255,
@@ -122,7 +155,7 @@ class TrainModel:
             
 
             
-            self.train_generator = self.train_datagen.flow_from_directory(directory=self.images_dir,
+            self.train_generator = self.train_datagen.flow_from_directory(directory=self.train_dir,
                                                                 class_mode='categorical',
                                                                 target_size=self.train_input_shape[0:2],
                                                                 batch_size=self.batch_size,
@@ -131,7 +164,7 @@ class TrainModel:
                                                                 classes=self.artists_name.tolist()
                                                             )
 
-            self.valid_generator = self.train_datagen.flow_from_directory(directory=self.images_dir,
+            self.valid_generator = self.train_datagen.flow_from_directory(directory=self.valid_dir,
                                                                         class_mode='categorical',
                                                                         target_size=self.train_input_shape[0:2],
                                                                         batch_size=self.batch_size,
@@ -190,8 +223,7 @@ class TrainModel:
         if self.archictecture == "ResNet50":
             self.base_model = ResNet50(weights='imagenet', 
                                        include_top=False, 
-                                       input_shape=self.train_input_shape,
-                                       batch_norm = self.normalization)
+                                       input_shape=self.train_input_shape)
             self.transfer_learning = True
 
         elif self.archictecture == "BasicCNN":
@@ -283,19 +315,25 @@ class TrainModel:
             self.transfer_learning = False
         
         elif self.archictecture == 'VGG':
-            self.vgg_model() # This will create the self.model variable
+            self.model = VGG19(include_top=True,
+                               weights=None,
+                               input_tensor=None,
+                               input_shape=self.train_input_shape,
+                               pooling=None,
+                               classes=self.n_classes,
+                               classifier_activation="softmax"
+                            )
             self.transfer_learning = False
 
         elif self.archictecture == 'DenseNet':
             self.transfer_learning = False
-            self.model = DenseNet121(include_top=True,
+            self.model = DenseNet201(include_top=True,
                                      weights=None,
                                      input_tensor=None,
                                      input_shape=self.train_input_shape,
                                      pooling=None,
                                      classes=self.n_classes,
-                                     classifier_activation="softmax",
-                                     batch_norm=self.normalization
+                                     classifier_activation="softmax"
                                     )
 
         elif self.archictecture == "GoogLeNet":
@@ -306,7 +344,7 @@ class TrainModel:
                                      input_shape=self.train_input_shape,
                                      pooling=None,
                                      classes=self.n_classes,
-                                     batch_norm=self.normalization
+                                     classifier_activation="softmax"
                                     )
 
     def define_architecture(self):
@@ -332,7 +370,7 @@ class TrainModel:
             self.model = Model(inputs=self.base_model.input, outputs=output)
 
     def short_model(self):
-        n_epoch = 2
+        n_epoch = self.short_epoch
         self.early_stop = EarlyStopping(monitor='val_loss', patience=20, verbose=1, 
                            mode='auto', restore_best_weights=True)
 
@@ -372,7 +410,7 @@ class TrainModel:
                            optimizer=optimizer, 
                            metrics=['accuracy'])
 
-        n_epoch = 2
+        n_epoch = self.full_epoch
         self.full_history = self.model.fit_generator(generator=self.train_generator, 
                                                      steps_per_epoch=self.STEP_SIZE_TRAIN,
                                                      validation_data=self.valid_generator, 
@@ -386,9 +424,6 @@ class TrainModel:
                                                      class_weight=self.class_weights
                                                     )
         
-        
-
-
     def train(self):
         self.format_data()
         self.create_generators()
@@ -398,18 +433,15 @@ class TrainModel:
         
         # Saving Training Data:
         history = {}
-        print(self.short_history.history.keys())
         history['loss'] = self.short_history.history['loss'] 
         history['accuracy'] = self.short_history.history['accuracy'] 
         history['val_loss'] = self.short_history.history['val_loss'] 
         history['val_accuracy'] = self.short_history.history['val_accuracy'] 
-        history['lr'] = self.short_history.history['lr']
 
         history['last-accuracy'] = history['accuracy'][-1]
         history['last-loss'] = history['loss'][-1]
         history['last-val_loss'] = history['val_loss'][-1]
         history['last-val_accuracy'] = history['val_accuracy'][-1]
-        history['last-lr'] = history['lr'][-1]
 
         # Hyperparams selected 
         history['arch'] = self.archictecture
@@ -419,19 +451,21 @@ class TrainModel:
         history['seed'] = self.seed_n
         history['valid_split'] = self.validation_split
 
-        if history['last-accuracy'] > 0.14: # Making sure first couple layers is atleast above 50% accuracy.
+        if history['last-accuracy'] > self.full_cutoff: # Making sure first couple layers is atleast above 50% accuracy.
             self.full_model()
 
             history['loss'] += self.full_history.history['loss']
             history['accuracy'] += self.full_history.history['accuracy']
             history['val_loss'] += self.full_history.history['val_loss']
             history['val_accuracy'] += self.full_history.history['val_accuracy']
-            history['lr'] += self.full_history.history['lr']
 
             history['last-accuracy'] = history['accuracy'][-1]
             history['last-loss'] = history['loss'][-1]
             history['last-val_loss'] = history['val_loss'][-1]
             history['last-val_accuracy'] = history['val_accuracy'][-1]
-            history['last-lr'] = history['lr'][-1]
+            self.model.save(self.weight_dir + '/' + self.model_name + '.h5')
+
+        else:
+            self.model.save(self.weight_dir + '/' + self.model_name + '.h5')
         
         return history
