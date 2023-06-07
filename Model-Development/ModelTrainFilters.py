@@ -45,7 +45,9 @@ class TrainModel:
                  full_epoch:int, 
                  full_cutoff:float, 
                  weights_dir:str, 
-                 model_name:str, 
+                 model_name:str,
+                 pool:str, # Pooling method
+                 acti:str, # Activation function 
                  home_dir="/home/ceg98/Documents/"):
         
         tf.random.set_seed(seed_n)
@@ -75,6 +77,9 @@ class TrainModel:
         self.short_epoch = short_epochs
         self.full_epoch = full_epoch
         self.full_cutoff = full_cutoff
+
+        self.activation = acti
+        self.pooling_technique = pool
         
 
         self.custom_gen = custom_gen
@@ -100,6 +105,7 @@ class TrainModel:
             # DenseNet-264: [6, 12, 64, 48]
         self.growth_rate = 32
         self.reduction = 0.5
+
         
 
     def format_data(self):
@@ -129,7 +135,7 @@ class TrainModel:
                                                    laplacian=self.laplacian,
                                                    garbor=self.garbor,
                                                    classes=self.artists_name.tolist(),
-                                                   weighted=True,
+                                                   weighted=self.augments,
                                                    augments=self.augments,
                                                    image_size=self.image_size)
 
@@ -147,8 +153,6 @@ class TrainModel:
 
             self.train_datagen = ImageDataGenerator(validation_split=0.2,
                                                     rescale=1/255,
-                                                    rotation_range=45,
-                                                    zoom_range=0.7,
                                                     horizontal_flip=True,
                                                     vertical_flip=True
                                                     )
@@ -222,7 +226,9 @@ class TrainModel:
     def get_architecture(self):
         if self.archictecture == "ResNet50":
             self.base_model = ResNet50(weights='imagenet', 
-                                       include_top=False, 
+                                       include_top=False,
+                                       classifier_activation=self.activation,
+                                       pooling=self.pooling_technique,
                                        input_shape=self.train_input_shape)
             self.transfer_learning = True
 
@@ -331,9 +337,9 @@ class TrainModel:
                                      weights=None,
                                      input_tensor=None,
                                      input_shape=self.train_input_shape,
-                                     pooling=None,
+                                     pooling=self.pooling_technique,
                                      classes=self.n_classes,
-                                     classifier_activation="softmax"
+                                     classifier_activation=self.activation
                                     )
 
         elif self.archictecture == "GoogLeNet":
@@ -377,7 +383,7 @@ class TrainModel:
         self.reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, 
                                     verbose=1, mode='auto')
 
-        optimizer = Adam(lr=self.lr)
+        optimizer = Adam(learning_rate=self.lr)
         self.model.compile(loss='categorical_crossentropy',
                     optimizer=optimizer, 
                     metrics=['accuracy'])
@@ -405,7 +411,7 @@ class TrainModel:
             self.model = model
 
         
-        optimizer = Adam(lr=self.lr)
+        optimizer = Adam(learning_rate=self.lr)
         self.model.compile(loss='categorical_crossentropy',
                            optimizer=optimizer, 
                            metrics=['accuracy'])
@@ -450,6 +456,21 @@ class TrainModel:
         history['learning-rate'] = self.lr
         history['seed'] = self.seed_n
         history['valid_split'] = self.validation_split
+        history['dropout'] = self.dropout
+        history['dropout_rate'] = self.dropout_rate
+        history['augments'] = self.augments
+        history['short_epoch'] = self.short_epoch
+        history['full_epoch'] = self.full_epoch
+        history['custom_gen'] = self.custom_gen
+        history['model_name'] = self.model_name
+        history['garbor'] = self.garbor
+        history['laplacian'] = self.laplacian
+        history['normalization'] = self.normalization
+        history['best_classes'] = self.best_classes
+        history['features'] = self.n_features
+
+        history['activation'] = self.activation
+        history['pooling'] = self.pooling_technique
 
         if history['last-accuracy'] > self.full_cutoff: # Making sure first couple layers is atleast above 50% accuracy.
             self.full_model()
