@@ -23,6 +23,7 @@ Looking At HSV Visualization of Van Gogh Painting:
 
 https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/e9e5f86f-3b6b-4cb3-bdfd-3a7eeb9c0cd3
 
+![ezgif-4-12847aecd8](https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/1693e2f9-f992-4fd6-9978-2d9b3ef45a0f)
 
 
 ## Models
