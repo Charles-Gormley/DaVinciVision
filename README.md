@@ -1,12 +1,24 @@
 # DaVinciVision 🎨
 Project for DSCI-471 where the aim is to build CNN prediction models which predict which artist created an artwork.
 
-## Getting Started
+## File Explanation
+- gitignore - contains file types to ignore for git.
+- Image-Vis.mp4 - Video version of HSV Distribution of Van Gogh Painting
+- TODO.md - contains broad next steps for the project.
+- EDA - Directory containing Exploratory Data Analysis
+    - Analysis.ipynb - Jupyter notebook overlooking Feature analysis for the NN
+    - ImageDimensionResearch.ipynb - jupyter notebook entailing different resizing function.
+- Model-Development
+    - FilterGenerator.py - Custom Generator I built. Handles the insertion of new feature dimesions, data augmentation, class-weighting correction, one-hot-encoding, etc...
+    - ModelTrain.py - Python Class which accepts numerous inputs ( model-architecture, hyperparameters, etc...) then has a function which allows you train the results and receive the feed back back as a dictionary. 
+    - Tuning*.ipynb - rough draft of tuning & training notebooks. These notebooks basically just call the ModelTrain Class and train a series of models with given hyperparameters.
+    - Results - Directory recording the training results. Each of the files inside is a pickle file in the form of a list, with each index containing a dictionary regarding a training session.
+
+## Downloading Data
 1. Pull the Repo. 
 2. Download this dataset and **copy the directory where you saved it**.
 3. Navigate to the *helpers/SetDataLocation.py* file and change the vlaue for the *path_to_dataset* variables with correct file path splitting for your os ( / - for windows )
-4. Run the SetDataLocation.py File. Now you can work with the noteobooks! 👏
-5. Check out hte Analysis.ipynb file
+4. Run the SetDataLocation.py File. Now you can work with the EDA noteobooks! 👏
 
 ## Dataset
 https://www.kaggle.com/datasets/ikarus777/best-artworks-of-all-time
