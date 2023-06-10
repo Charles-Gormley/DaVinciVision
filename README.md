@@ -64,3 +64,15 @@ Looking At HSV Visualization of Van Gogh Painting:
         - image_2.jpg
     etc...
 etc...
+
+## Results
+#### BasicCNN - Initial Run
+![image](https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/0129f636-2542-419f-bd8f-b95151de6bf6)
+#### BasicCNN - Tuning & Laplacian Filters
+![image](https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/627a1b01-3e61-4a1e-9cc1-58aea4a96265)
+#### DenseNet - Tuning & Laplacian Filters
+![image](https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/99e49a47-8d02-4aa3-b4c2-a2d8dbff4c7f)
+####  Resnet50 - Tuning & Transfer Learning
+![image](https://github.com/Charles-Gormley/DaVinciVision/assets/76138796/f084f5ee-8b89-463c-9e0d-d2e20d5a0938)
+
+
